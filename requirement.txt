@@ -1,0 +1,12 @@
+streamlit
+google-generativeai
+langchain
+langchain-community
+langchain-text-splitters
+PyPDF2
+python-docx
+docx2txt
+pydantic
+tiktoken
+pdfminer.six
+protobuf
