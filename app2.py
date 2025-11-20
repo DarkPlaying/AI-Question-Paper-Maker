@@ -2,7 +2,7 @@
 import os
 import tempfile
 import streamlit as st
-import google-generativeai as genai
+import google.generativeai as genai
 from langchain_community.document_loaders import PyPDFLoader, Docx2txtLoader, TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
@@ -110,4 +110,5 @@ Format clearly like this:
 
 else:
     st.info("👆 Upload a file to begin.")
+
 
