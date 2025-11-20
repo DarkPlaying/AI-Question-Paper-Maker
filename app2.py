@@ -9,7 +9,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 # -----------------------------
 # 1. Configure Gemini API Key
 # -----------------------------
-GOOGLE_API_KEY = st.secrets.get("GOOGLE_API_KEY") or os.getenv("GOOGLE_API_KEY")
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 if not GOOGLE_API_KEY:
     st.error("⚠️ Missing Google Generative AI Key! Add it to .streamlit/secrets.toml or environment variables.")
     st.stop()
@@ -110,5 +110,6 @@ Format clearly like this:
 
 else:
     st.info("👆 Upload a file to begin.")
+
 
 
