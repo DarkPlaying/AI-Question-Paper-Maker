@@ -3,10 +3,7 @@ google-generativeai
 langchain
 langchain-community
 langchain-text-splitters
-PyPDF2
+pydantic<3
 python-docx
+PyPDF2
 docx2txt
-pydantic
-tiktoken
-pdfminer.six
-protobuf
