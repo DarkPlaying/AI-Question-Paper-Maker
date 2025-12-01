@@ -1,20 +1,26 @@
 # app.py
 import os
+import random
 import tempfile
 import streamlit as st
 import google.generativeai as genai
 from langchain_community.document_loaders import PyPDFLoader, Docx2txtLoader, TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
+
 # -----------------------------
 # 1. Configure Gemini API Key
 # -----------------------------
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY") or st.secrets.get("GOOGLE_API_KEY", None)
 if not GOOGLE_API_KEY:
-    st.error("⚠️ Missing Google Generative AI Key! Add it to .streamlit/secrets.toml or environment variables.")
+    st.error(
+        "⚠️ Missing Google Generative AI Key! "
+        "Set GOOGLE_API_KEY in Railway variables or .streamlit/secrets.toml."
+    )
     st.stop()
 
 genai.configure(api_key=GOOGLE_API_KEY)
+
 
 # -----------------------------
 # 2. Streamlit UI
@@ -54,29 +60,64 @@ if uploaded_file:
     st.success("✅ Document loaded successfully!")
 
     # -----------------------------
-    # 3. Choose question paper type
+    # 3. Question paper settings
     # -----------------------------
     st.subheader("🧩 Select question paper pattern")
     num_two = st.number_input("Number of 2-mark questions", 0, 20, 10)
     num_five = st.number_input("Number of 5-mark questions", 0, 10, 5)
     num_ten = st.number_input("Number of 10-mark questions", 0, 5, 2)
 
+    st.subheader("✏️ Extra instructions (optional)")
+    teacher_comment = st.text_area(
+        "Tell the AI how to customize the paper "
+        "(e.g. \"Include one 10‑mark question explaining DBMS in detail\" "
+        "or \"Generate only short 5‑mark questions\" )",
+        value="",
+        height=120,
+    )
+
     if st.button("🪄 Generate Question Paper"):
         with st.spinner("Generating your question paper... ⏳"):
             model = genai.GenerativeModel("gemini-2.0-flash")
 
-            prompt = f"""
-You are an expert question paper setter.
-Create a question paper based on the following study material:
+            # Random variation seed so each click has slightly different input
+            variation_seed = random.randint(1, 1_000_000)
 
---- Document Content Start ---
-{full_text[:15000]}   # limit for API
---- Document Content End ---
-
-Generate:
+            # If teacher gives instructions, let them control the pattern
+            if teacher_comment.strip():
+                requirement_text = (
+                    "Follow these teacher instructions when deciding the number of "
+                    "questions, marks and style:\n"
+                    f"{teacher_comment.strip()}\n"
+                )
+            else:
+                requirement_text = f"""
+Generate exactly:
 - {num_two} questions of 2 marks
 - {num_five} questions of 5 marks
 - {num_ten} questions of 10 marks
+"""
+
+            prompt = f"""
+You are an expert university question paper setter.
+You must create different sets of questions each time you are called,
+avoiding reusing previous questions as much as possible.
+
+Study material:
+
+--- Document Content Start ---
+{full_text[:15000]}
+--- Document Content End ---
+
+Requirements:
+{requirement_text}
+
+Additional rules:
+- Do NOT repeat questions or wording from any previous paper you might have created.
+- Vary phrasing, ordering and subtopics so each paper feels different.
+- Use clear, exam-style questions only.
+
+Random variation id: {variation_seed}
 
 Format clearly like this:
 📘 **Question Paper**
@@ -92,7 +133,7 @@ Format clearly like this:
 **Section C (10 Marks Questions)**
 1. ...
 2. ...
-            """
+"""
 
             response = model.generate_content(prompt)
             question_paper = response.text
@@ -100,7 +141,6 @@ Format clearly like this:
         st.markdown("## 🧾 Generated Question Paper")
         st.write(question_paper)
 
-        # Download option
         st.download_button(
             label="💾 Download Question Paper (TXT)",
             data=question_paper,
@@ -110,6 +150,3 @@ Format clearly like this:
 
 else:
     st.info("👆 Upload a file to begin.")
-
-
-
