@@ -31,7 +31,7 @@ genai.configure(api_key=GOOGLE_API_KEY)
 # -----------------------------
 # 1b. Model fallback config
 # -----------------------------
-PRIMARY_MODEL = "gemini-2.5-flash"
+PRIMARY_MODEL = "gemini-2.0-flash"
 FALLBACK_MODELS = [
     "gemini-2.5-flash-lite",
     "gemma-3-1b",
@@ -207,3 +207,4 @@ Format clearly like this:
 
 else:
     st.info("👆 Upload a file to begin.")
+
