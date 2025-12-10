@@ -27,7 +27,7 @@ user_api_key = st.sidebar.text_input(
 
 # Button to open Google AI Studio API key dashboard (for generating keys)
 st.sidebar.link_button(
-    "🔑 Get / Manage Gemini API Key",
+    "🔑 Get Gemini API Key",
     "https://aistudio.google.com/app/apikey",
     help="Opens Google AI Studio where you can generate and manage your API keys."
 )
@@ -187,3 +187,4 @@ Format clearly like this:
 
 else:
     st.info("👆 Upload a file to begin.")
+
